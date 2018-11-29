@@ -1,0 +1,57 @@
+﻿@model LoginUserApplication.Models.Employee
+
+@{
+    ViewBag.Title = "Login";
+}
+
+@section Scripts
+{
+    <script src="@Url.Content("~/Scripts/script.js")"></script>
+    <link href="@Url.Content("~/Content/StyleSheet.css")" rel="stylesheet" type="text/css" />
+
+    <script>
+        function redirectToEmployee() {
+            document.location = '/Home/Employee';
+        }
+    </script>
+}
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        <br><br>
+        <div class="col-md-4 col-md-offset-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading" align="center">
+                    Login
+                </div>
+                <div class="panel-body" id="my-popup-div">
+                    <form name="myForm" id="myForm" method="post">
+                        <div>
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group">
+                            <label for="username">User Name:- </label>
+                            <input id="username" name="UserName" class="form-control" type="text" placeholder="Username">
+                            <span id="error_username" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password:- </label>
+                            <input id="password" name="UserPass" class="form-control" type="password" placeholder="Password">
+                            <span id="error_password" class="text-danger"></span>
+                        </div>
+                        <div align="center">
+                            <button align="center" id="login" type="submit" value="login" class="btn btn-primary center btn-info btn-lg">Login</button>
+                            <button id="reset" type="reset" value="reset" class="btn btn-primary center btn-info btn-lg" onclick="redirectToEmployee()">Sign Up</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to Home", "Index")
+</div>
