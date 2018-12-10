@@ -1,0 +1,246 @@
+﻿@model LoginUserApplication.Models.Employee
+
+@{
+    ViewBag.Title = "KendoData";
+
+}
+
+
+@*@section Scripts
+        {
+        @Scripts.Render("~/Scripts/KendoScript.js");
+
+    }*@
+
+<h3>@ViewBag.Massage</h3>
+
+
+<br />
+<div>
+
+    @Html.Kendo().AutoComplete().Name("AutoCompleteSearch").Placeholder("Enter Search Text")
+    <script>
+
+        $(document).ready(function () {
+            $("#AutoCompleteSearch").kendoAutoComplete({
+
+                dataSource: {
+                    //filter: "contains",
+                    type: "aspnetmvc-ajax",
+                    transport: {
+                        read: {
+                            url: '@Url.Action("Read", "Home")'         // "Read"
+                        },
+                        schema: {
+                            data: "Data",
+                            total: "Total",
+                            model: {
+                                fields: {
+                                    "FirstName": { type: "string" },
+                                }
+                            }
+                        }
+
+                    }
+                }
+            });
+
+            var autoComplete = $("#AutoCompleteSearch").data("contains");
+            //autoComplete.search(data);
+        });
+
+    </script>
+</div>
+
+<br />
+<div>
+    Search By First Name:
+    <input class="k-textbox" type="text" id="txtSearchString" placeholder="enter search text..." />
+    <button id="btnSearch">Search</button>
+    <script>
+        $(document).ready(function () {
+
+
+            $("#btnSearch").kendoButton({
+                dataSource: {
+                    type: "aspnetmvc-ajax",
+                    transport: {
+                        read: {
+                            url: '@Url.Action("Read", "Home")'         // "Read"
+                        }
+                    },
+                    schema: {
+                        data: "Data",
+                        total: "Total",
+                        model: {
+                            fields: {
+                                "FirstName": { type: "string" }
+                            }
+                        }
+                    }
+                    filter: { field: "FirstName" operator: "contains"  value:"c" }
+                },
+            });
+            dataSource.kendoAutoComplete("btnSearch");
+
+
+        });
+    </script>
+
+</div>
+
+
+<br />
+
+@**@
+<div>
+    <div>
+        custom search:-<input data-bind="value: value" aria-label="First Name" data-role="autocomplete" data-text-field="FirstName" data-filter="startswith" data-delay="200" data-min-length="1" data-value-primitive="true" type="text" class="k-textbox" autocomplete="off" role="textbox" aria-haspopup="true" aria-disabled="false" aria-readonly="false" aria-autocomplete="list" aria-owns="" aria-expanded="false" aria-busy="false">
+        <br />
+        Filter all fields:<input type="search" id='filter' class='k-textbox' placeholder="enter search text..." />
+    </div>
+    <br />
+    <div id="KendoGrid"></div>
+    <script>
+        $(document).ready(function () {
+
+            $("#KendoGrid").kendoGrid({
+                dataSource: {
+                    type: "aspnetmvc-ajax",
+                    transport: {
+                        read: {
+                            url: '@Url.Action("Read", "Home")'         // "Read"
+                        }
+                    },
+                    schema: {
+                        data: "Data",
+                        total: "Total",
+                        model: {
+                            fields: {
+                                "FirstName": { type: "string" },
+                                "LastName": { type: "string" },
+                                "UserName": { type: "string" },
+                                "UserPass": { type: "string" },
+                                "Email": { type: "string" },
+                                "Addr": { type: "string" },
+                                "DOB": { type: "date" },
+                                "PhoneNo": { type: "int" },
+                                "Gender": { type: "string" }
+                            }
+                        }
+                    },
+                    pageSize: 10,
+                },
+                height: 450,
+                groupable: true,
+                sortable: true,
+                scrollable: true,
+                resizable: true,
+                filterable: {
+                    mode: "row"
+                },
+                
+                pageable: {
+                    refresh: true,
+                    previousNext: true,
+                    pageSizes: [ 10, 15, 20, "all"],
+                    buttonCount: 5,
+
+                },
+                columns: [{
+
+                    field: "FirstName",
+                    title: "First Name",
+                    filterable: true,
+                    width: 120
+                }, {
+
+                    field: "LastName",
+                        title: "Last Name",
+                        filterable: false,
+                    width: 120
+
+                }, {
+                field: "UserName",
+                        title: "User Name",
+                        filterable: false,
+                    width: 120
+                }, {
+                    field: "Gender",
+                    title: "Gender",
+                    template: "#if(Gender == 'Male') {#<div >" +
+                            " <img id='image' src='@(Url.Content("~/Content/icons/male-icon.jpg"))'/>" +
+                            "</div>#} else if(Gender == 'Female'){#<div >" +
+                            " <img id='image' src='@(Url.Content("~/Content/Icons/female-icon.jpg"))'/>" +
+                            "</div>#}#",
+                        filterable: false,
+                    width: 70
+                }, {
+                    field: "Addr",
+                        title: "City",
+                        filterable: false,
+                    width: 120
+                }, {
+                    field: "DOB",
+                    title: "DOB",
+                        format: "{0:dd MMM yyyy}",
+                        filterable: false,
+                    width: 100
+                }, {
+                    field: "PhoneNo",
+                        title: "PhoneNo",
+                        filterable: false,
+                    width: 70
+                }, {
+                    field: "Email",
+                        width: 150,
+                        filterable: false,
+                }]
+            });
+
+            $("#filter").on("input", function (e) {
+                var grid = $("#KendoGrid").data("kendoGrid");
+                var columns = grid.columns;
+                var filter = { logic: 'or', filters: [{ field: "FirstName" }] };
+                columns.forEach(function (x) {
+                    if (x.field) {
+                        //var type = grid.dataSource.options.schema.model.fields[x.field].type;
+                        var type = grid.dataSource.options.schema.model.fields[x.field].type;
+                        if (type == 'string') {
+                            filter.filters.push({
+                                field: x.field,
+                                operator: 'contains',
+                                value: e.target.value
+                            })
+                        }
+                    }
+                });
+                grid.dataSource.filter(filter);
+            });
+        });
+    </script>
+</div>
+
+
+
+<style type="text/css">
+
+    #image {
+        width: 40%;
+        height: 40%;
+    }
+
+    .k-link {
+        display: inline-block;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    #KendoGrid {
+        text-align: center;
+    }
+
+    .k-input {
+        width: 200px;
+    }
+</style>
